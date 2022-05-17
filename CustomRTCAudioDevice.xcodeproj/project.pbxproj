@@ -1,0 +1,408 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6DD77DF0281BFC7500F5FC0C /* CustomRTCAudioDeviceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77DEF281BFC7500F5FC0C /* CustomRTCAudioDeviceApp.swift */; };
+		6DD77DF2281BFC7500F5FC0C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77DF1281BFC7500F5FC0C /* ContentView.swift */; };
+		6DD77DF4281BFC7800F5FC0C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DD77DF3281BFC7800F5FC0C /* Assets.xcassets */; };
+		6DD77DF7281BFC7800F5FC0C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DD77DF6281BFC7800F5FC0C /* Preview Assets.xcassets */; };
+		6DD77E0C281C063A00F5FC0C /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 6DD77E0B281C063A00F5FC0C /* WebRTC */; };
+		6DD77E0E281C082000F5FC0C /* SimulateStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77E0D281C082000F5FC0C /* SimulateStream.swift */; };
+		6DD77E10281C1B1200F5FC0C /* AVAudioEngineRTCAudioDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77E0F281C1B1200F5FC0C /* AVAudioEngineRTCAudioDevice.swift */; };
+		6DD77E12281D10A200F5FC0C /* AUAudioUnitRTCAudioDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77E11281D10A200F5FC0C /* AUAudioUnitRTCAudioDevice.swift */; };
+		6DD77E14282C21BB00F5FC0C /* Synth.aif in Resources */ = {isa = PBXBuildFile; fileRef = 6DD77E13282C21BB00F5FC0C /* Synth.aif */; };
+		6DD77E16282D4CFD00F5FC0C /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77E15282D4CFD00F5FC0C /* Utils.swift */; };
+		6DD77E18282FF53100F5FC0C /* AudioSessionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD77E17282FF53100F5FC0C /* AudioSessionHandler.swift */; };
+		6DE09614283CCFE90003E059 /* SimpleAudioConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE09613283CCFE90003E059 /* SimpleAudioConverter.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6DD77DEC281BFC7500F5FC0C /* CustomRTCAudioDevice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CustomRTCAudioDevice.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DD77DEF281BFC7500F5FC0C /* CustomRTCAudioDeviceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRTCAudioDeviceApp.swift; sourceTree = "<group>"; };
+		6DD77DF1281BFC7500F5FC0C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		6DD77DF3281BFC7800F5FC0C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6DD77DF6281BFC7800F5FC0C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		6DD77E07281C055000F5FC0C /* WebRTC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = WebRTC; path = Frameworks/WebRTC; sourceTree = "<group>"; };
+		6DD77E0D281C082000F5FC0C /* SimulateStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulateStream.swift; sourceTree = "<group>"; };
+		6DD77E0F281C1B1200F5FC0C /* AVAudioEngineRTCAudioDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVAudioEngineRTCAudioDevice.swift; sourceTree = "<group>"; };
+		6DD77E11281D10A200F5FC0C /* AUAudioUnitRTCAudioDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUAudioUnitRTCAudioDevice.swift; sourceTree = "<group>"; };
+		6DD77E13282C21BB00F5FC0C /* Synth.aif */ = {isa = PBXFileReference; lastKnownFileType = file; name = Synth.aif; path = Audio/Synth.aif; sourceTree = "<group>"; };
+		6DD77E15282D4CFD00F5FC0C /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		6DD77E17282FF53100F5FC0C /* AudioSessionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionHandler.swift; sourceTree = "<group>"; };
+		6DE09613283CCFE90003E059 /* SimpleAudioConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleAudioConverter.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6DD77DE9281BFC7500F5FC0C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DD77E0C281C063A00F5FC0C /* WebRTC in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6DD77DE3281BFC7500F5FC0C = {
+			isa = PBXGroup;
+			children = (
+				6DD77E06281C055000F5FC0C /* Packages */,
+				6DD77DEE281BFC7500F5FC0C /* CustomRTCAudioDevice */,
+				6DD77DED281BFC7500F5FC0C /* Products */,
+				6DD77E03281C040D00F5FC0C /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		6DD77DED281BFC7500F5FC0C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6DD77DEC281BFC7500F5FC0C /* CustomRTCAudioDevice.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6DD77DEE281BFC7500F5FC0C /* CustomRTCAudioDevice */ = {
+			isa = PBXGroup;
+			children = (
+				6DE09613283CCFE90003E059 /* SimpleAudioConverter.swift */,
+				6DD77E13282C21BB00F5FC0C /* Synth.aif */,
+				6DD77DEF281BFC7500F5FC0C /* CustomRTCAudioDeviceApp.swift */,
+				6DD77DF1281BFC7500F5FC0C /* ContentView.swift */,
+				6DD77E0D281C082000F5FC0C /* SimulateStream.swift */,
+				6DD77DF3281BFC7800F5FC0C /* Assets.xcassets */,
+				6DD77DF5281BFC7800F5FC0C /* Preview Content */,
+				6DD77E11281D10A200F5FC0C /* AUAudioUnitRTCAudioDevice.swift */,
+				6DD77E0F281C1B1200F5FC0C /* AVAudioEngineRTCAudioDevice.swift */,
+				6DD77E15282D4CFD00F5FC0C /* Utils.swift */,
+				6DD77E17282FF53100F5FC0C /* AudioSessionHandler.swift */,
+			);
+			path = CustomRTCAudioDevice;
+			sourceTree = "<group>";
+		};
+		6DD77DF5281BFC7800F5FC0C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				6DD77DF6281BFC7800F5FC0C /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		6DD77E03281C040D00F5FC0C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6DD77E06281C055000F5FC0C /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6DD77E07281C055000F5FC0C /* WebRTC */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6DD77DEB281BFC7500F5FC0C /* CustomRTCAudioDevice */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6DD77DFA281BFC7800F5FC0C /* Build configuration list for PBXNativeTarget "CustomRTCAudioDevice" */;
+			buildPhases = (
+				6DD77DE8281BFC7500F5FC0C /* Sources */,
+				6DD77DE9281BFC7500F5FC0C /* Frameworks */,
+				6DD77DEA281BFC7500F5FC0C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CustomRTCAudioDevice;
+			packageProductDependencies = (
+				6DD77E0B281C063A00F5FC0C /* WebRTC */,
+			);
+			productName = CustomRTCAudioDevice;
+			productReference = 6DD77DEC281BFC7500F5FC0C /* CustomRTCAudioDevice.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6DD77DE4281BFC7500F5FC0C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					6DD77DEB281BFC7500F5FC0C = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 6DD77DE7281BFC7500F5FC0C /* Build configuration list for PBXProject "CustomRTCAudioDevice" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6DD77DE3281BFC7500F5FC0C;
+			packageReferences = (
+			);
+			productRefGroup = 6DD77DED281BFC7500F5FC0C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6DD77DEB281BFC7500F5FC0C /* CustomRTCAudioDevice */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6DD77DEA281BFC7500F5FC0C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DD77DF7281BFC7800F5FC0C /* Preview Assets.xcassets in Resources */,
+				6DD77DF4281BFC7800F5FC0C /* Assets.xcassets in Resources */,
+				6DD77E14282C21BB00F5FC0C /* Synth.aif in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6DD77DE8281BFC7500F5FC0C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DD77E12281D10A200F5FC0C /* AUAudioUnitRTCAudioDevice.swift in Sources */,
+				6DE09614283CCFE90003E059 /* SimpleAudioConverter.swift in Sources */,
+				6DD77E0E281C082000F5FC0C /* SimulateStream.swift in Sources */,
+				6DD77DF2281BFC7500F5FC0C /* ContentView.swift in Sources */,
+				6DD77E10281C1B1200F5FC0C /* AVAudioEngineRTCAudioDevice.swift in Sources */,
+				6DD77DF0281BFC7500F5FC0C /* CustomRTCAudioDeviceApp.swift in Sources */,
+				6DD77E18282FF53100F5FC0C /* AudioSessionHandler.swift in Sources */,
+				6DD77E16282D4CFD00F5FC0C /* Utils.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6DD77DF8281BFC7800F5FC0C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6DD77DF9281BFC7800F5FC0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6DD77DFB281BFC7800F5FC0C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CustomRTCAudioDevice/Preview Content\"";
+				DEVELOPMENT_TEAM = 86QC3QVLML;
+				ENABLE_BITCODE = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "WebRTC Test";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.mstyura.RTCAudioDevice;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6DD77DFC281BFC7800F5FC0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CustomRTCAudioDevice/Preview Content\"";
+				DEVELOPMENT_TEAM = 86QC3QVLML;
+				ENABLE_BITCODE = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "WebRTC Test";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.mstyura.RTCAudioDevice;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6DD77DE7281BFC7500F5FC0C /* Build configuration list for PBXProject "CustomRTCAudioDevice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6DD77DF8281BFC7800F5FC0C /* Debug */,
+				6DD77DF9281BFC7800F5FC0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6DD77DFA281BFC7800F5FC0C /* Build configuration list for PBXNativeTarget "CustomRTCAudioDevice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6DD77DFB281BFC7800F5FC0C /* Debug */,
+				6DD77DFC281BFC7800F5FC0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6DD77E0B281C063A00F5FC0C /* WebRTC */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebRTC;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6DD77DE4281BFC7500F5FC0C /* Project object */;
+}
