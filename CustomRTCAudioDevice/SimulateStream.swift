@@ -13,6 +13,30 @@ enum RTCAudioDeviceKind {
   case avAudioEngine
 }
 
+
+func makePeerConnectionFactory(audioDeviceKind: RTCAudioDeviceKind) -> RTCPeerConnectionFactory {
+  let device: RTCAudioDevice
+  switch audioDeviceKind {
+  case .auAudioUnit:
+    device = AUAudioUnitRTCAudioDevice()
+  case .avAudioEngine:
+    device = AVAudioEngineRTCAudioDevice()
+  }
+  let factory = RTCPeerConnectionFactory(
+    encoderFactory: RTCDefaultVideoEncoderFactory(),
+    decoderFactory: RTCDefaultVideoDecoderFactory(),
+    audioDevice: device)
+
+  let options = RTCPeerConnectionFactoryOptions()
+  options.ignoreCellularNetworkAdapter = true
+  options.ignoreVPNNetworkAdapter = true
+  options.ignoreEthernetNetworkAdapter = true
+  options.ignoreWiFiNetworkAdapter = true
+  options.ignoreLoopbackNetworkAdapter = false
+  factory.setOptions(options)
+  return factory
+}
+
 actor SimulateStream: NSObject {
   private let peerConnectionFactory: RTCPeerConnectionFactory
 
@@ -26,27 +50,8 @@ actor SimulateStream: NSObject {
   private lazy var viewer = peerConnectionFactory.peerConnection(with: config, constraints: contraints, delegate: self)
   
   init(audioDeviceKind: RTCAudioDeviceKind) {
-    // RTCSetMinDebugLogLevel(.none)
-    let device: RTCAudioDevice
-    switch audioDeviceKind {
-    case .auAudioUnit:
-      device = AUAudioUnitRTCAudioDevice()
-    case .avAudioEngine:
-      device = AVAudioEngineRTCAudioDevice()
-    }
-    let factory = RTCPeerConnectionFactory(
-      encoderFactory: RTCDefaultVideoEncoderFactory(),
-      decoderFactory: RTCDefaultVideoDecoderFactory(),
-      audioDevice: device)
-    
-    let options = RTCPeerConnectionFactoryOptions()
-    options.ignoreCellularNetworkAdapter = true
-    options.ignoreVPNNetworkAdapter = true
-    options.ignoreEthernetNetworkAdapter = true
-    options.ignoreWiFiNetworkAdapter = true
-    options.ignoreLoopbackNetworkAdapter = false
-    factory.setOptions(options)
-    peerConnectionFactory = factory
+
+    peerConnectionFactory = makePeerConnectionFactory(audioDeviceKind: audioDeviceKind)
 
     super.init()
   }

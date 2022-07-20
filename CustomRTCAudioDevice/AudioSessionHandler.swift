@@ -54,21 +54,21 @@ extension AudioSessionHandler {
       @unknown default:
         return
       }
-
+      
     }
     let routeChangeNotificationSubscribtion = center.addObserver(forName: AVAudioSession.routeChangeNotification,
-                                                             object: audioSession,
-                                                             queue: nil) { [weak self] notification in
+                                                                 object: audioSession,
+                                                                 queue: nil) { [weak self] notification in
       guard let self = self else {
         return
       }
       print("\(AVAudioSession.routeChangeNotification): \(notification) -> \(self.audioSession.describedState)")
       self.handleAudioRouteChange()
     }
-
+    
     let mediaServicesWereLostNotificationSubscribtion = center.addObserver(forName: AVAudioSession.mediaServicesWereLostNotification,
-                                                                       object: audioSession,
-                                                                       queue: nil) { [weak self] notification in
+                                                                           object: audioSession,
+                                                                           queue: nil) { [weak self] notification in
       print(AVAudioSession.mediaServicesWereLostNotification)
       guard let self = self else {
         return
@@ -76,8 +76,8 @@ extension AudioSessionHandler {
       self.handleMediaServerWereLost()
     }
     let mediaServicesWereResetNotificationSubscribtion = center.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification,
-                                                                        object: audioSession,
-                                                                        queue: nil) { [weak self] notification in
+                                                                            object: audioSession,
+                                                                            queue: nil) { [weak self] notification in
       print(AVAudioSession.mediaServicesWereResetNotification)
       guard let self = self else {
         return
@@ -97,6 +97,50 @@ extension AudioSessionHandler {
     let center = NotificationCenter.default
     for observer in observers {
       center.removeObserver(observer)
+    }
+  }
+
+  func configureStereoRecording() {
+    // Find the built-in microphone input.
+    guard let availableInputs = audioSession.availableInputs,
+          let builtInMicInput = availableInputs.first(where: { $0.portType == .builtInMic }) else {
+      print("The device must have a built-in microphone.")
+      return
+    }
+    
+    // Make the built-in microphone input the preferred input.
+    do {
+      try audioSession.setPreferredInput(builtInMicInput)
+    } catch {
+      print("Unable to set the built-in mic as the preferred input.")
+      return
+    }
+    
+    
+    guard let preferredInput = audioSession.preferredInput,
+          let dataSources = preferredInput.dataSources,
+          let frontStereo = dataSources.first(where: { $0.orientation == .front }),
+          let supportedPolarPatterns = frontStereo.supportedPolarPatterns else {
+      print("No polar patterns.")
+      return
+    }
+    var isStereoSupported = false
+    do {
+      isStereoSupported = supportedPolarPatterns.contains(.stereo)
+      // If the data source supports stereo, set it as the preferred polar pattern.
+      if isStereoSupported {
+        // Set the preferred polar pattern to stereo.
+        try frontStereo.setPreferredPolarPattern(.stereo)
+      }
+      
+      // Set the preferred data source and polar pattern.
+      try preferredInput.setPreferredDataSource(frontStereo)
+      
+      // Update the input orientation to match the current user interface orientation.
+      try audioSession.setPreferredInputOrientation(.portrait)
+      
+    } catch {
+      fatalError("Unable to select the \(frontStereo.dataSourceName) data source.")
     }
   }
 }

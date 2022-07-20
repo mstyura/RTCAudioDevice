@@ -62,6 +62,11 @@ func getBuffer(fileURL: URL) -> AVAudioPCMBuffer? {
 }
 
 extension AVAudioSession {
+
+  var supportsVoiceProcessing: Bool {
+    self.category == .playAndRecord && (self.mode == .voiceChat || self.mode == .videoChat)
+  }
+
   var describedState: String {
     "AudioSession: preferredSampleRate=\(self.preferredSampleRate)" +
     ", sampleRate=\(self.sampleRate)" +

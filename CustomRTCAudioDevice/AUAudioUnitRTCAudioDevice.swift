@@ -40,6 +40,40 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
     }
   }
 
+  private lazy var audioInputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
+                                                    sampleRate: audioSession.sampleRate,
+                                                    channels: AVAudioChannelCount(min(2, audioSession.inputNumberOfChannels)),
+                                                    interleaved: true) {
+    didSet {
+      guard oldValue != audioInputFormat else { return }
+      delegate?.notifyAudioInputParametersChange()
+    }
+  }
+
+  private lazy var audioOutputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
+                                                     sampleRate: audioSession.sampleRate,
+                                                     channels: AVAudioChannelCount(min(2, audioSession.outputNumberOfChannels)),
+                                                     interleaved: true) {
+    didSet {
+      guard oldValue != audioOutputFormat else { return }
+      delegate?.notifyAudioOutputParametersChange()
+    }
+  }
+
+  private (set) lazy var inputLatency = audioSession.inputLatency {
+    didSet {
+      guard oldValue != inputLatency else { return }
+      delegate?.notifyAudioInputParametersChange()
+    }
+  }
+  
+  private (set) lazy var outputLatency = audioSession.outputLatency {
+    didSet {
+      guard oldValue != outputLatency else { return }
+      delegate?.notifyAudioOutputParametersChange()
+    }
+  }
+
   override init() {
     super.init()
   }
@@ -78,17 +112,6 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
       return
     }
 
-    do {
-      try audioSession.setPreferredSampleRate(max(delegate.preferredInputSampleRate, delegate.preferredOutputSampleRate))
-    } catch let e {
-      print("Error setPreferredSampleRate: \(e)")
-    }
-    do {
-      try audioSession.setPreferredIOBufferDuration(min(delegate.preferredOutputIOBufferDuration, delegate.preferredInputIOBufferDuration))
-    } catch let e {
-      print("Error setPreferredIOBufferDuration: \(e)")
-    }
-
     if audioUnit.isInputEnabled != shouldRecord {
       stopAndUnitializeAudioUnit("toggle input")
       measureTime(label: "AVAudioUnit toggle input") {
@@ -102,14 +125,15 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
         audioUnit.isOutputEnabled = shouldPlay
       }
     }
+    
 
     let hardwareSampleRate = audioSession.sampleRate
     if shouldRecord {
       let rtcRecordFormat = AVAudioFormat(
         commonFormat: .pcmFormatInt16,
         sampleRate: hardwareSampleRate,
-        channels: AVAudioChannelCount(inputNumberOfChannels),
-        interleaved: false)!
+        channels: AVAudioChannelCount(min(2, audioSession.inputNumberOfChannels)),
+        interleaved: true)!
 
       let bus = 1
       let outputBus = audioUnit.outputBusses[bus]
@@ -118,7 +142,6 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
         measureTime(label: "Update recording format of audioUnit.outputBusses[\(bus)]") {
           do {
             try outputBus.setFormat(rtcRecordFormat)
-            delegate.notifyAudioInputParametersChange()
             print("Record format set to: \(rtcRecordFormat)")
           } catch let e {
             print("Failed update audioUnit.outputBusses[\(bus)].format of audio unit: \(e)")
@@ -126,6 +149,7 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
           }
         }
       }
+      audioInputFormat = rtcRecordFormat
 
       measureTime(label: "AVAudioUnit define inputHandler") {
         let deliverRecordedData = delegate.deliverRecordedData
@@ -133,7 +157,6 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
         let customRenderBlock = { actionFlags, timestamp, inputBusNumber, frameCount, abl in
           return renderBlock(actionFlags, timestamp, frameCount, inputBusNumber, abl, nil)
         }
-
         audioUnit.inputHandler = { actionFlags, timestamp, frameCount, inputBusNumber in
           let status = deliverRecordedData(actionFlags, timestamp, inputBusNumber, frameCount, nil, customRenderBlock)
           if status != noErr {
@@ -141,14 +164,15 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
           }
         }
       }
+      inputLatency = audioSession.inputLatency
     }
   
     if shouldPlay {
       let rtcPlayFormat = AVAudioFormat(
         commonFormat: .pcmFormatInt16,
         sampleRate: hardwareSampleRate,
-        channels: AVAudioChannelCount(outputNumberOfChannels),
-        interleaved: false)!
+        channels: AVAudioChannelCount(min(2, audioSession.outputNumberOfChannels)),
+        interleaved: true)!
       let bus = 0;
       let inputBus = audioUnit.inputBusses[bus]
       if inputBus.format != rtcPlayFormat {
@@ -156,7 +180,6 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
         measureTime(label: "Update playout format of audioUnit.inputBusses[\(bus)]") {
           do {
             try inputBus.setFormat(rtcPlayFormat)
-            delegate.notifyAudioOutputParametersChange()
             print("Play format set to: \(rtcPlayFormat)")
           } catch let e {
             print("Failed update audioUnit.inputBusses[\(bus)].format of audio unit: \(e)")
@@ -164,6 +187,7 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
           }
         }
       }
+      audioOutputFormat = rtcPlayFormat
 
       if audioUnit.outputProvider == nil {
         measureTime(label: "AVAudioUnit define outputProvider") {
@@ -174,6 +198,7 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
           }
         }
       }
+      outputLatency = audioSession.outputLatency
     }
 
     if !audioUnit.renderResourcesAllocated {
@@ -205,17 +230,37 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
 
 extension AUAudioUnitRTCAudioDevice: RTCAudioDevice {
 
-  var inputSampleRate: Double { audioSession.sampleRate }
+  var inputSampleRate: Double {
+    guard let sampleRate = audioInputFormat?.sampleRate, sampleRate > 0 else {
+      return audioSession.sampleRate
+    }
+    return sampleRate
+  }
+
+  var outputSampleRate: Double {
+    guard let sampleRate = audioOutputFormat?.sampleRate, sampleRate > 0 else {
+      return audioSession.sampleRate
+    }
+    return sampleRate
+  }
 
   var inputIOBufferDuration: TimeInterval { audioSession.ioBufferDuration }
 
-  var outputSampleRate: Double { audioSession.sampleRate }
-
   var outputIOBufferDuration: TimeInterval { audioSession.ioBufferDuration }
 
-  var inputNumberOfChannels: Int { 1 }
+  var inputNumberOfChannels: Int {
+    guard let channelCount = audioInputFormat?.channelCount, channelCount > 0 else {
+      return min(2, audioSession.inputNumberOfChannels)
+    }
+    return Int(channelCount)
+  }
 
-  var outputNumberOfChannels: Int { 1 }
+  var outputNumberOfChannels: Int {
+    guard let channelCount = audioOutputFormat?.channelCount, channelCount > 0 else {
+      return min(2, audioSession.outputNumberOfChannels)
+    }
+    return Int(channelCount)
+  }
 
   var isInitialized: Bool {
     delegate != nil && audioUnit != nil
@@ -225,9 +270,10 @@ extension AUAudioUnitRTCAudioDevice: RTCAudioDevice {
     guard self.delegate == nil else {
       return false
     }
+
     let description = AudioComponentDescription(
       componentType: kAudioUnitType_Output,
-      componentSubType: kAudioUnitSubType_VoiceProcessingIO,
+      componentSubType: audioSession.supportsVoiceProcessing ? kAudioUnitSubType_VoiceProcessingIO : kAudioUnitSubType_RemoteIO,
       componentManufacturer: kAudioUnitManufacturer_Apple,
       componentFlags: 0,
       componentFlagsMask: 0);
@@ -245,6 +291,9 @@ extension AUAudioUnitRTCAudioDevice: RTCAudioDevice {
     
     if subscribtions == nil {
       subscribtions = subscribeAudioSessionNotifications()
+    }
+    if !audioSession.supportsVoiceProcessing {
+      configureStereoRecording()
     }
     
     self.audioUnit = audioUnit

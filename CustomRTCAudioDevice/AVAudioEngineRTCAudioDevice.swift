@@ -22,8 +22,26 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
   private var audioSourceNode: AVAudioSourceNode?
   private var shouldPlay = false
   private var shouldRecord = false
-  private var audioInputFormat: AVAudioFormat?
-  private var audioOutputFormat: AVAudioFormat?
+
+  private lazy var audioInputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
+                                                    sampleRate: audioSession.sampleRate,
+                                                    channels: AVAudioChannelCount(min(2, audioSession.inputNumberOfChannels)),
+                                                    interleaved: false) {
+    didSet {
+      guard oldValue != audioInputFormat else { return }
+      delegate?.notifyAudioInputParametersChange()
+    }
+  }
+
+  private lazy var audioOutputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
+                                                     sampleRate: audioSession.sampleRate,
+                                                     channels: AVAudioChannelCount(min(2, audioSession.outputNumberOfChannels)),
+                                                     interleaved: false) {
+    didSet {
+      guard oldValue != audioOutputFormat else { return }
+      delegate?.notifyAudioOutputParametersChange()
+    }
+  }
 
   private var isInterrupted_ = false
   private var isInterrupted: Bool {
@@ -50,6 +68,20 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
       queue.sync {
         delegate_ = newValue
       }
+    }
+  }
+
+  private (set) lazy var inputLatency = audioSession.inputLatency {
+    didSet {
+      guard oldValue != inputLatency else { return }
+      delegate?.notifyAudioInputParametersChange()
+    }
+  }
+  
+  private (set) lazy var outputLatency = audioSession.outputLatency {
+    didSet {
+      guard oldValue != outputLatency else { return }
+      delegate?.notifyAudioOutputParametersChange()
     }
   }
 
@@ -97,8 +129,7 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
       shutdownEngine()
     }
 
-    let useVoiceProcessingAudioUnit =
-      audioSession.category == .playAndRecord && (audioSession.mode == .voiceChat || audioSession.mode == .videoChat)
+    let useVoiceProcessingAudioUnit = audioSession.supportsVoiceProcessing
     if let audioEngine = audioEngine, audioEngine.inputNode.isVoiceProcessingEnabled != useVoiceProcessingAudioUnit {
       print("Shutdown AVAudioEngine to toggle usage of Voice Processing I/O")
       shutdownEngine()
@@ -108,6 +139,10 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
     if let engine = self.audioEngine {
       audioEngine = engine
     } else {
+      if !useVoiceProcessingAudioUnit {
+        configureStereoRecording()
+      }
+
       audioEngine = AVAudioEngine()
       audioEngine.isAutoShutdownEnabled = true
       // NOTE: Toggle voice processing state over outputNode, not to eagerly create inputNote.
@@ -173,17 +208,14 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
 
           let rtcRecordFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
                                               sampleRate: inputFormat.sampleRate,
-                                              channels: 1,
-                                              interleaved: false)!
-          if rtcRecordFormat != audioInputFormat {
-            audioInputFormat = rtcRecordFormat
-            delegate.notifyAudioInputParametersChange()
-          }
+                                              channels: inputFormat.channelCount,
+                                              interleaved: true)!
+          audioInputFormat = rtcRecordFormat
+          inputLatency = audioSession.inputLatency
 
           // NOTE: AVAudioSinkNode provides audio data with HW sample rate in 32-bit float format,
           // WebRTC requires 16-bit int format, so do the conversion
           let converter = SimpleAudioConverter(from: inputFormat, to: rtcRecordFormat)!
-
           let audioSink = AVAudioSinkNode(receiverBlock: { (timestamp, framesCount, inputData) -> OSStatus in
             var flags: AudioUnitRenderActionFlags = []
             return deliverRecordedData(&flags, timestamp, 1, framesCount, nil, { actionFlags, timestamp, inputBusNumber, frameCount, abl in
@@ -217,17 +249,16 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
             print("Invalid audio output format detected: \(outputFormat)")
             return
           }
+          print("Playout format: \(outputFormat)")
           audioEngine.connect(audioEngine.mainMixerNode, to: audioEngine.outputNode, format: outputFormat)
 
           let rtcPlayFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
                                             sampleRate: outputFormat.sampleRate,
-                                            channels: 1,
-                                            interleaved: false)!
+                                            channels: outputFormat.channelCount,
+                                            interleaved: true)!
 
-          if audioOutputFormat != rtcPlayFormat {
-            audioOutputFormat = rtcPlayFormat
-            delegate.notifyAudioOutputParametersChange()
-          }
+          audioOutputFormat = rtcPlayFormat
+          inputLatency = audioSession.inputLatency
 
           let getPlayoutData = delegate.getPlayoutData
           let audioSource = AVAudioSourceNode(format: rtcPlayFormat,
@@ -319,14 +350,14 @@ extension AVAudioEngineRTCAudioDevice: RTCAudioDevice {
 
   var inputNumberOfChannels: Int {
     guard let channelCount = audioInputFormat?.channelCount, channelCount > 0 else {
-      return audioSession.inputNumberOfChannels
+      return min(2, audioSession.inputNumberOfChannels)
     }
     return Int(channelCount)
   }
 
   var outputNumberOfChannels: Int {
     guard let channelCount = audioOutputFormat?.channelCount, channelCount > 0 else {
-      return audioSession.outputNumberOfChannels
+      return min(2, audioSession.outputNumberOfChannels)
     }
     return Int(channelCount)
   }
@@ -364,19 +395,13 @@ extension AVAudioEngineRTCAudioDevice: RTCAudioDevice {
     measureTime {
       updateEngine()
     }
-    audioInputFormat = nil
-    audioOutputFormat = nil
     delegate = nil
     return true
   }
 
-  var isPlayoutInitialized: Bool { audioOutputFormat != nil }
+  var isPlayoutInitialized: Bool { isInitialized }
 
   func initializePlayout() -> Bool {
-    audioOutputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
-                                      sampleRate: audioSession.sampleRate,
-                                      channels: 1,
-                                      interleaved: false)
     return isPlayoutInitialized
   }
 
@@ -399,17 +424,12 @@ extension AVAudioEngineRTCAudioDevice: RTCAudioDevice {
     measureTime {
       updateEngine()
     }
-    audioOutputFormat = nil
     return true
   }
 
-  var isRecordingInitialized: Bool { audioInputFormat != nil }
+  var isRecordingInitialized: Bool { isInitialized }
 
   func initializeRecording() -> Bool {
-    audioInputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16,
-                                     sampleRate: audioSession.sampleRate,
-                                     channels: 1,
-                                     interleaved: false)
     return isRecordingInitialized
   }
 
@@ -432,7 +452,6 @@ extension AVAudioEngineRTCAudioDevice: RTCAudioDevice {
     measureTime {
       updateEngine()
     }
-    audioInputFormat = nil
     return true
   }
 }

@@ -9,7 +9,6 @@ import SwiftUI
 import AVFoundation
 import WebRTC
 
-
 func requestAudioSession(mode: AVAudioSession.Mode, completionHandler: @escaping (AVAudioSession) -> Void) {
   let audioSession = AVAudioSession.sharedInstance()
   
@@ -32,20 +31,20 @@ func requestAudioSession(mode: AVAudioSession.Mode, completionHandler: @escaping
     }
 
     print("Before \(audioSession.describedState)")
-    do {
-      try audioSession.setPreferredInputNumberOfChannels(1)
-    } catch let e {
-      print("Failed to setPreferredInputNumberOfChannels: \(e)")
-    }
+//    do {
+//      try audioSession.setPreferredInputNumberOfChannels(1)
+//    } catch let e {
+//      print("Failed to setPreferredInputNumberOfChannels: \(e)")
+//    }
+//
+//    do {
+//      try audioSession.setPreferredOutputNumberOfChannels(1)
+//    } catch let e {
+//      print("Failed to setPreferredOutputNumberOfChannels: \(e)")
+//    }
 
     do {
-      try audioSession.setPreferredOutputNumberOfChannels(1)
-    } catch let e {
-      print("Failed to setPreferredOutputNumberOfChannels: \(e)")
-    }
-
-    do {
-      try audioSession.setPreferredSampleRate(2 * 8000)
+      try audioSession.setPreferredSampleRate(6 * 8000)
     } catch let e {
       print("Failed to setPreferredSampleRate: \(e)")
     }
@@ -97,11 +96,18 @@ struct ContentView: View {
       }
 
       Button {
-        requestAudioSession(mode: .videoChat) { session in
+        requestAudioSession(mode: .default) { session in
           
         }
       } label: {
-        Text("Activate audio session")
+        Text("Audio session playAndRecord + default (supports stereo recording)")
+      }.padding()
+      
+      Button {
+        requestAudioSession(mode: .videoChat) { session in
+        }
+      } label: {
+        Text("Audio session playAndRecord + videoChat (supports voice processing)")
       }.padding()
 
       if session == nil {
