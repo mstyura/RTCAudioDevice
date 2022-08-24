@@ -216,11 +216,16 @@ final class AVAudioEngineRTCAudioDevice: NSObject {
           // NOTE: AVAudioSinkNode provides audio data with HW sample rate in 32-bit float format,
           // WebRTC requires 16-bit int format, so do the conversion
           let converter = SimpleAudioConverter(from: inputFormat, to: rtcRecordFormat)!
+
+          let customRenderBlock: RTCAudioDeviceRenderRecordedDataBlock = { actionFlags, timestamp, inputBusNumber, frameCount, abl, renderContext in
+            let (converter, inputData) = renderContext!.assumingMemoryBound(to: (Unmanaged<SimpleAudioConverter>, UnsafeMutablePointer<AudioBufferList>).self).pointee
+            return converter.takeUnretainedValue().convert(framesCount: frameCount, from: inputData, to: abl)
+          }
+
           let audioSink = AVAudioSinkNode(receiverBlock: { (timestamp, framesCount, inputData) -> OSStatus in
             var flags: AudioUnitRenderActionFlags = []
-            return deliverRecordedData(&flags, timestamp, 1, framesCount, nil, { actionFlags, timestamp, inputBusNumber, frameCount, abl in
-              return converter.convert(framesCount: framesCount, from: inputData, to: abl)
-            })
+            var renderContext = (Unmanaged.passUnretained(converter), inputData)
+            return deliverRecordedData(&flags, timestamp, 1, framesCount, nil, &renderContext, customRenderBlock)
           })
     
           measureTime(label: "Attach AVAudioSinkNode") {

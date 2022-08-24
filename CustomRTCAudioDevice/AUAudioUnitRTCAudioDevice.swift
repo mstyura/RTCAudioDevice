@@ -154,11 +154,11 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
       measureTime(label: "AVAudioUnit define inputHandler") {
         let deliverRecordedData = delegate.deliverRecordedData
         let renderBlock = audioUnit.renderBlock
-        let customRenderBlock = { actionFlags, timestamp, inputBusNumber, frameCount, abl in
+        let customRenderBlock: RTCAudioDeviceRenderRecordedDataBlock = { actionFlags, timestamp, inputBusNumber, frameCount, abl, renderContext in
           return renderBlock(actionFlags, timestamp, frameCount, inputBusNumber, abl, nil)
         }
         audioUnit.inputHandler = { actionFlags, timestamp, frameCount, inputBusNumber in
-          let status = deliverRecordedData(actionFlags, timestamp, inputBusNumber, frameCount, nil, customRenderBlock)
+          let status = deliverRecordedData(actionFlags, timestamp, inputBusNumber, frameCount, nil, nil, customRenderBlock)
           if status != noErr {
             print("Failed to deliver audio data: \(status)")
           }
