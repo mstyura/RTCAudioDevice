@@ -9,54 +9,58 @@ import SwiftUI
 import AVFoundation
 import WebRTC
 
-func requestAudioSession(mode: AVAudioSession.Mode, completionHandler: @escaping (AVAudioSession) -> Void) {
-  let audioSession = AVAudioSession.sharedInstance()
-  
-  audioSession.requestRecordPermission { ok in
-    guard ok else {
-      return
-    }
-    do {
-      try audioSession.setCategory(.playAndRecord, mode: mode, policy: .default, options: [.allowBluetooth, .allowBluetoothA2DP, .defaultToSpeaker, .duckOthers, .mixWithOthers,.overrideMutedMicrophoneInterruption ])
-    } catch let e {
-      print("Set category: \(e)")
-      return
-    }
+enum AudioSessionError: Error {
+  case noMicrophonePermission
+  case configurationError(Error)
+}
 
-    do {
-      try audioSession.setActive(true)
-    } catch let e {
-      print("Set active: \(e)")
-      return
+func requestAudioSession(category: AVAudioSession.Category,
+                         mode: AVAudioSession.Mode,
+                         options: AVAudioSession.CategoryOptions) async throws {
+  return try await withCheckedThrowingContinuation { cont in
+    let audioSession = AVAudioSession.sharedInstance()
+
+    audioSession.requestRecordPermission { ok in
+      guard ok else {
+        cont.resume(with: .failure(AudioSessionError.noMicrophonePermission))
+        return
+      }
+      do {
+        try audioSession.setCategory(category,
+                                     mode: mode,
+                                     policy: .default,
+                                     options: options)
+      } catch {
+        print("Set category: \(error)")
+        cont.resume(with: .failure(AudioSessionError.configurationError(error)))
+        return
+      }
+
+      do {
+        try audioSession.setActive(true)
+      } catch {
+        print("Set active: \(error)")
+        cont.resume(with: .failure(AudioSessionError.configurationError(error)))
+        return
+      }
+
+      print("Before \(audioSession.describedState)")
+
+      do {
+        try audioSession.setPreferredSampleRate(6 * 8000)
+      } catch {
+        print("Failed to setPreferredSampleRate: \(error)")
+      }
+
+      do {
+        try audioSession.setPreferredIOBufferDuration(0.02)
+      } catch {
+        print("Failed to setPreferredIOBufferDuration: \(error)")
+      }
+
+      print("After \(audioSession.describedState)")
+      cont.resume(with: .success(()))
     }
-
-    print("Before \(audioSession.describedState)")
-//    do {
-//      try audioSession.setPreferredInputNumberOfChannels(1)
-//    } catch let e {
-//      print("Failed to setPreferredInputNumberOfChannels: \(e)")
-//    }
-//
-//    do {
-//      try audioSession.setPreferredOutputNumberOfChannels(1)
-//    } catch let e {
-//      print("Failed to setPreferredOutputNumberOfChannels: \(e)")
-//    }
-
-    do {
-      try audioSession.setPreferredSampleRate(6 * 8000)
-    } catch let e {
-      print("Failed to setPreferredSampleRate: \(e)")
-    }
-
-    do {
-      try audioSession.setPreferredIOBufferDuration(0.02)
-    } catch let e {
-      print("Failed to setPreferredIOBufferDuration: \(e)")
-    }
-
-    print("After \(audioSession.describedState)")
-    completionHandler(audioSession)
   }
 }
 
@@ -96,15 +100,39 @@ struct ContentView: View {
       }
 
       Button {
-        requestAudioSession(mode: .default) { session in
-          
+        Task {
+          do {
+            try await requestAudioSession(category: .playAndRecord,
+                                          mode: .default,
+                                          options: [.allowBluetoothA2DP,
+                                                    .allowBluetooth,
+                                                    .allowAirPlay,
+                                                    .defaultToSpeaker,
+                                                    .mixWithOthers,
+                                                    .duckOthers,
+                                                    .mixWithOthers])
+          } catch {
+            print(error)
+          }
         }
       } label: {
         Text("Audio session playAndRecord + default (supports stereo recording)")
       }.padding()
       
       Button {
-        requestAudioSession(mode: .videoChat) { session in
+        Task {
+          do {
+            try await requestAudioSession(category: .playAndRecord,
+                                          mode: .videoChat,
+                                          options: [.allowBluetoothA2DP,
+                                                    .allowBluetooth,
+                                                    .allowAirPlay,
+                                                    .mixWithOthers,
+                                                    .duckOthers,
+                                                    .mixWithOthers])
+          } catch {
+            print(error)
+          }
         }
       } label: {
         Text("Audio session playAndRecord + videoChat (supports voice processing)")

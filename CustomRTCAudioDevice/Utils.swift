@@ -68,16 +68,28 @@ extension AVAudioSession {
   }
 
   var describedState: String {
-    "AudioSession: preferredSampleRate=\(self.preferredSampleRate)" +
-    ", sampleRate=\(self.sampleRate)" +
-    ", preferredIOBufferDuration=\(self.preferredIOBufferDuration)" +
-    ", ioBufferDuration=\(self.ioBufferDuration)" +
-    ", preferredInputNumberOfChannels=\(self.preferredInputNumberOfChannels)" +
-    ", inputNumberOfChannels=\(self.inputNumberOfChannels)" +
-    ", maximumInputNumberOfChannels=\(self.maximumInputNumberOfChannels)" +
-    ", preferredOutputNumberOfChannels=\(self.preferredOutputNumberOfChannels)" +
-    ", outputNumberOfChannels=\(self.outputNumberOfChannels)" +
-    ", maximumOutputNumberOfChannels=\(self.maximumOutputNumberOfChannels)"
+    var description = "AudioSession: category=\(self.category.rawValue)" +
+      ", mode=\(self.mode.rawValue)" +
+      ", options=\(self.categoryOptions.rawValue)" +
+      ", preferredSampleRate=\(self.preferredSampleRate)" +
+      ", sampleRate=\(self.sampleRate)" +
+      ", preferredIOBufferDuration=\(self.preferredIOBufferDuration)" +
+      ", ioBufferDuration=\(self.ioBufferDuration)" +
+      ", preferredInputNumberOfChannels=\(self.preferredInputNumberOfChannels)" +
+      ", isInputAvailable=\(self.isInputAvailable)" +
+      ", inputNumberOfChannels=\(self.inputNumberOfChannels)" +
+      ", maximumInputNumberOfChannels=\(self.maximumInputNumberOfChannels)" +
+      ", preferredOutputNumberOfChannels=\(self.preferredOutputNumberOfChannels)" +
+      ", outputNumberOfChannels=\(self.outputNumberOfChannels)" +
+      ", maximumOutputNumberOfChannels=\(self.maximumOutputNumberOfChannels)" +
+      ", allowHapticsAndSystemSoundsDuringRecording=\(self.allowHapticsAndSystemSoundsDuringRecording)"
+
+    if #available(iOS 14.5, *) {
+      description += ", prefersNoInterruptionsFromSystemAlerts=\(self.prefersNoInterruptionsFromSystemAlerts)"
+    }
+    description +=
+      ", currentRoute=\(self.currentRoute)"
+    return description
   }
 }
 
