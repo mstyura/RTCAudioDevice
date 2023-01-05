@@ -230,14 +230,14 @@ final class AUAudioUnitRTCAudioDevice: NSObject {
 
 extension AUAudioUnitRTCAudioDevice: RTCAudioDevice {
 
-  var inputSampleRate: Double {
+  var deviceInputSampleRate: Double {
     guard let sampleRate = audioInputFormat?.sampleRate, sampleRate > 0 else {
       return audioSession.sampleRate
     }
     return sampleRate
   }
 
-  var outputSampleRate: Double {
+  var deviceOutputSampleRate: Double {
     guard let sampleRate = audioOutputFormat?.sampleRate, sampleRate > 0 else {
       return audioSession.sampleRate
     }
@@ -301,7 +301,7 @@ extension AUAudioUnitRTCAudioDevice: RTCAudioDevice {
     return true
   }
 
-  func terminate() -> Bool {
+  func terminateDevice() -> Bool {
     if let subscribtions = subscribtions {
       unsubscribeAudioSessionNotifications(observers: subscribtions)
     }
